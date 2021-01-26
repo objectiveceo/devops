@@ -16,6 +16,12 @@ function verifyInstallation {
 	fi
 }
 
+function cleanupRemoveArchive {
+	local sshHost="$1"
+	local path="$2"
+	ssh "$sshHost" "rm \"${path}\""
+}
+
 function main {
 	local destination="${1:?You must provide an SSH URL in the format of host:path/to/file}"
 	local imageName="${2:?You must provide a Docker image name as well (org/container:version).}"
@@ -27,8 +33,11 @@ function main {
 	verifyInstallation "$sshHost" "$imageName"
 	if [[ $? -eq 0 ]]; then
 		echo "Successfully installed ${imageName} on ${sshHost}"
+		cleanupRemoveArchive "$sshHost" "$path"
+		echo "Removed $path on $sshHost"
 	else
 		echo "Unable to verify that ${dockerImageName} was successfully installed on ${sshHost}"
+		exit -1
 	fi
 }
 
