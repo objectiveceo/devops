@@ -111,7 +111,8 @@ function main {
 	local imageFile=$(buildImage "$IMAGE_NAME" "$dockerImageName" "$nextBuildNumber" "$OUTPUT_DIR")
 	
 	waitForImage "$imageFile"
-	echo "Built ${imageFile}"
+	echo "Done"
+	echo "${imageFile}"
 }
 
 main "$@"
