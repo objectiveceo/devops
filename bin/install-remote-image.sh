@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function installImage {
 	local sshRoot="$1"
 	local imageFile="$2"

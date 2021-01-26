@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function pushImage {
 	local imageFile="$1"
 	scp "$imageFile" "$SSH_ROOT":"$REMOTE_STAGING_DIRECTORY"
