@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 readonly BIN="$(cd "$(dirname "${BASH_SOURCE[@]}")"; pwd)"
 readonly SSH_IMAGE_DESTINATION="${SSH_IMAGE_DESTINATION:?Provide SSH image destination}"
 
