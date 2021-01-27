@@ -21,7 +21,12 @@ function main {
 	fi
 
 	echo "Pushing $gzippedImagePath to $destination"
+	scp "$gzippedImagePath" "$destination"
 	echo "Done"
+
+	if [[ ${destination: -1} == / ]]; then
+		destination="${destination}$(basename "$gzippedImagePath")"
+	fi
 	
 	echo "$destination"
 }
