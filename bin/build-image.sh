@@ -84,10 +84,8 @@ function buildImage {
 	local dockerFileName="${imageName//\//+}-${nextBuildNumber}"
 	local outfile="${outputDir%/}/${dockerFileName}.tar.gz"
 	
-	(
-		docker build -t $dockerImageName . > /dev/null
-		docker save "$dockerImageName" | gzip > "$outfile"
-	)
+	docker build -t $dockerImageName . | tee "${LOG_FILE:-docker_build.log}"
+	docker save "$dockerImageName" | gzip > "$outfile"
 	
 	echo $outfile
 }
