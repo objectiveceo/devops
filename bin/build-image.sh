@@ -2,8 +2,9 @@
 
 readonly REMOTE_STAGING_DIRECTORY=${REMOTE_STAGING_DIRECTORY:-"staging"}
 readonly DOCKER_ORG=${DOCKER_ORG:-"objectiveceo"}
-readonly SSH_ROOT=${SSH_ROOT:-"bethany"}
-readonly DOCKER_NETWORK=${DOCKER_NETWEORK:-"bethany"}
+readonly SSH_ROOT=${SSH_ROOT:-"objectiveceo"}
+readonly OUTPUT_DIR="${OUTPUT_DIR:-"${HOME}/Desktop"}"
+readonly BUILD_NUMBER=${BUILD_NUMBER:-"X"}
 
 function findProjectRoot {
 	local root="$(pwd)"
@@ -21,42 +22,8 @@ function findProjectRoot {
 	echo "$root"
 }
 
-function getMaxVersion {
-	local param="${1:-$(</dev/stdin)}"
-	echo "$param" | sort -t. -k1,1n -k2,2n -k3,3n | tail -n1
-}
-
-function incrementPatchVersion {
-	local param="${1:-$(</dev/stdin)}"
-	IFS=. read -r major minor patch <<< "$param"
-	((patch += 1))
-	echo "${major:-0}.${minor:-0}.${patch}"
-}
-
-function getBuiltImages {
-	local imageName="$1"
-	docker images | grep "$imageName"
-}
-
-function getBuildNumbers {
-	echo "$1" | awk '{ print $2 }'
-}
-
-function getNextBuildNumber {
-	if [[ -z $1 ]]; then
-		echo 1.0.0
-	else
-		getBuildNumbers "$1" | getMaxVersion | incrementPatchVersion
-	fi
-}
-
-function gitTag {
-	local version="$1"
-	echo "$version" > VERSION
-	git add VERSION
-	git commit -m "Updating shipping version to ${version}"
-	git tag "$version"
-}
+readonly PROJECT_ROOT="${PROJECT_ROOT:-$(findProjectRoot)}"
+readonly IMAGE_NAME="${IMAGE_NAME:-$(basename "${PROJECT_ROOT}")}"
 
 function waitForImage {
 	local imageFile="$1"
@@ -75,43 +42,20 @@ function generateDockerImageName {
 	echo "${DOCKER_ORG}/${imageName}:${nextBuildNumber}"
 }
 
-function buildImage {
-	local imageName="$1"
-	local dockerImageName="$2"
-	local nextBuildNumber="$3"
-	local outputDir="$4"
-
-	local dockerFileName="${imageName//\//+}-${nextBuildNumber}"
-	local outfile="${outputDir%/}/${dockerFileName}.tar.gz"
-	
-	docker build -t $dockerImageName . | tee "${LOG_FILE:-docker_build.log}"
-	docker save "$dockerImageName" | gzip > "$outfile"
-	
-	echo $outfile
-}
-
 function main {
-	local PROJECT_ROOT="${PROJECT_ROOT:-$(findProjectRoot)}"
-	local IMAGE_NAME="${IMAGE_NAME:-$(basename "${PROJECT_ROOT}")}"
-	local OUTPUT_DIR="${OUTPUT_DIR:-"${HOME}/Desktop"}"
-
-	local matchingImages=$(getBuiltImages "$IMAGE_NAME")
-	local nextBuildNumber=${BUILD_NUMBER:-$(getNextBuildNumber "$matchingImages")}
-
 	cd "$PROJECT_ROOT"
 
-	echo "Add tag $nextBuildNumber"
-	echo gitTag "$nextBuildNumber"
-
-	local dockerImageName=$(generateDockerImageName "$IMAGE_NAME" "$nextBuildNumber")
+	local dockerImageName=$(generateDockerImageName "$IMAGE_NAME" "$BUILD_NUMBER")
 	
 	echo "Building ${dockerImageName}"
 	if [[ ! -d "$OUTPUT_DIR" ]]; then
 		mkdir -p "$OUTPUT_DIR"
 	fi
 
-	local imageFile=$(buildImage "$IMAGE_NAME" "$dockerImageName" "$nextBuildNumber" "$OUTPUT_DIR")
-	
+	local imageFile="${OUTPUT_DIR%/}/${IMAGE_NAME//\//+}-${BUILD_NUMBER}.tar.gz"
+	docker build -t $dockerImageName . | tee "${LOG_FILE:-docker_build.log}"
+	docker save "$dockerImageName" | gzip > "$imageFile"
+
 	waitForImage "$imageFile"
 	if [[ ! -f "$imageFile" ]]; then
 		echo "$imageFile was not built; exiting."
