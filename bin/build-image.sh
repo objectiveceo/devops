@@ -115,6 +115,11 @@ function main {
 	local imageFile=$(buildImage "$IMAGE_NAME" "$dockerImageName" "$nextBuildNumber" "$OUTPUT_DIR")
 	
 	waitForImage "$imageFile"
+	if [[ ! -f "$imageFile" ]]; then
+		echo "$imageFile was not built; exiting."
+		exit -1
+	fi
+
 	echo "Done"
 	echo "${imageFile}"
 }
