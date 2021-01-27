@@ -108,6 +108,10 @@ function main {
 	local dockerImageName=$(generateDockerImageName "$IMAGE_NAME" "$nextBuildNumber")
 	
 	echo "Building ${dockerImageName}"
+	if [[ ! -d "$OUTPUT_DIR" ]]; then
+		mkdir -p "$OUTPUT_DIR"
+	fi
+
 	local imageFile=$(buildImage "$IMAGE_NAME" "$dockerImageName" "$nextBuildNumber" "$OUTPUT_DIR")
 	
 	waitForImage "$imageFile"
