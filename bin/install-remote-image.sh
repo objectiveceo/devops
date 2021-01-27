@@ -21,7 +21,8 @@ function verifyInstallation {
 function cleanupRemoveArchive {
 	local sshHost="$1"
 	local path="$2"
-	ssh "$sshHost" "rm \"${path}\""
+	# Remove tar archive (gz has already been removed)
+	ssh "$sshHost" "rm \"${path%.gz}\""
 }
 
 function main {
