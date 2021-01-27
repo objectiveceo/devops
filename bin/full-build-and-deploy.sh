@@ -23,7 +23,8 @@ function main {
 
 	"${BIN}/verify-deployment.sh"
 	if [[ $? -ne 0 ]]; then
-		"${BIN}/rollback-deployment.sh"
+		"${BIN}/rollback-deployment.sh" "$sshHost" "$containerName"
+		"${BIN}/delete-container-and-image.sh" "$sshHost" "$containerName"
 	fi
 }
 
