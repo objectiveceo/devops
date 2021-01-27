@@ -20,6 +20,11 @@ function main {
 	local sshHost="$(echo "$SSH_IMAGE_DESTINATION" | sed -e 's/:.*//')"
 	local containerName="$(head -n1 "$logfile" | awk '{print $2}')"
 	"${BIN}/start-remote-image.sh" "$sshHost" "$containerName"
+
+	"${BIN}/verify-deployment.sh"
+	if [[ $? -ne 0 ]]; then
+		"${BIN}/rollback-deployment.sh"
+	fi
 }
 
 main "$@"
