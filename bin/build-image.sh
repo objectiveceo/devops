@@ -55,6 +55,7 @@ function main {
 	local imageFile="${OUTPUT_DIR%/}/${IMAGE_NAME//\//+}-${BUILD_NUMBER}.tar.gz"
 	docker build \
 		--build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+		--build-arg DATABASE_PATH=${DATABASE_PATH} \
 		-t $dockerImageName . | tee "${LOG_FILE:-docker_build.log}"
 	docker save "$dockerImageName" | gzip > "$imageFile"
 
