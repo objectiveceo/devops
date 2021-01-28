@@ -16,7 +16,7 @@ function main {
 	while read -r line; do
 		IFS=' ' read -r url expected <<< $line
 		printf "$url (expecting $expected)"
-		local output="$(curl --max-time 1 -IL "$url" 2> /dev/null)"
+		local output="$(curl --max-time 1 -I "$url" 2> /dev/null)"
 		local status=$(echo "$output" | grep "HTTP/" | awk '{print $2}')
 		echo " -> $status"
 		test "$status" = "$expected"
