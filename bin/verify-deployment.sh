@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eo pipefail
 
 function main {
 	echo "Taking a brief respite to let everything set up"
