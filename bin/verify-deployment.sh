@@ -3,7 +3,7 @@
 set -euo pipefail
 
 function main {
-	if [[ ! -z $VERIFY_FILE ]]; then
+	if [[ -f "$VERIFY_FILE" ]]; then
 		echo "Running verification using $VERIFY_FILE"
 	else
 		echo "Running verification using stdin"
