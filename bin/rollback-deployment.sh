@@ -16,7 +16,7 @@ function main {
 	local previousContainer="${name}:${version}"
 
 	echo "# Restoring $previousContainer"
-	 "${BIN}/start-remote-image.sh" "$sshHost" "$previousContainer" $ADDITIONAL_DOCKER_FLAGS
+	"${BIN}/start-remote-image.sh" "$sshHost" "$previousContainer" $ADDITIONAL_DOCKER_FLAGS
 }
 
 main "$@"
