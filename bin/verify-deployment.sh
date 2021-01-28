@@ -3,6 +3,10 @@
 set -euo pipefail
 
 function main {
+	echo "Taking a brief respite to let everything set up"
+	sleep 2
+	echo
+
 	if [[ -f "$VERIFY_FILE" ]]; then
 		echo "Running verification using $VERIFY_FILE"
 	else
