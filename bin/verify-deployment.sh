@@ -14,11 +14,12 @@ function main {
 	fi
 
 	while read -r line; do
-		printf "$line"
-		local output="$(curl --max-time 1 -IL "$line" 2> /dev/null)"
+		IFS=' ' read -r url expected <<< $line
+		printf "$url (expecting $expected)"
+		local output="$(curl --max-time 1 -IL "$url" 2> /dev/null)"
 		local status=$(echo "$output" | grep "HTTP/" | awk '{print $2}')
 		echo " -> $status"
-		test $status == *2* -o $status == *3*
+		test "$status" = "$expected"
 	done < ${VERIFY_FILE:-/dev/stdin}
 }
 
